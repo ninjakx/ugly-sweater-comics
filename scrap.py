@@ -1,9 +1,6 @@
-#################################################################
-                    
+#################################################################     
                  #creator : Kriti Sahu
-
-#script to download images from uglysweatercomics
-
+   #script to download images from uglysweatercomics
 #################################################################
 
 #Script to download images from uglysweater comics
@@ -111,7 +108,6 @@ def scrap(older_post):
             head=retval
 
             #print("head",head)
-            
 
             for fn in sorted(os.listdir(r)):
                 #print(fn)
@@ -137,7 +133,6 @@ def scrap(older_post):
                     writer.append_data(image)
 
             #time.sleep(3) #to wait for gif to create
-
             count=count+1  
               
             #remove png files from folder-Images           
@@ -145,9 +140,9 @@ def scrap(older_post):
             filelist = glob.glob("*.png")
             for f in filelist:
                 os.remove(f)
-      
+                
         else:
-            
+          
             #set directory         
             os.chdir(retval)
             #print(retval)
@@ -162,6 +157,7 @@ def scrap(older_post):
 
             #download images                   
             '''urllib.urlretrieve(imgs.get('src'), str(title[count]+str(extension)))'''
+            
             f_img=title[count].replace('/n','').strip()
 
             imgdata = urlopen(imgs.get('src')).read()
@@ -196,5 +192,5 @@ def main():
     
     # remove Images(folder) 
     shutil.rmtree(retval+'/Images') 
-
+    
 main()
