@@ -1,0 +1,7 @@
+bs4==0.0.1
+imageio==2.2.0
+lxml==3.8.0
+numpy==1.13.1
+Pillow==4.2.1
+requests==2.9.1
+urllib==1.21.1
