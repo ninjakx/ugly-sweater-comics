@@ -6,7 +6,6 @@
 
 #################################################################
 
-
 #Script to download images from uglysweater comics
 #You can also use selenium to move to older posts
 
@@ -22,9 +21,8 @@ import imageio
 import shutil
 import mimetypes
 import requests
+import cStringIO
 
-
-   
 #Create file in the directory where the script is
 def create_dir(fname): 
     global filename 
@@ -34,12 +32,14 @@ def create_dir(fname):
     os.chdir(filename)
     
     #Create Images folder to make gif
+    
     if not os.path.exists("Images"):
         os.makedirs("Images")  
 
 #Scrap the page
 
 def scrap(older_post):
+  
     count=0
 
     global get_url
@@ -53,7 +53,6 @@ def scrap(older_post):
     soup = BeautifulSoup(content,"lxml")
     title=[]
    
-
     #Title of the images
     for a in soup.find_all('h1',attrs={'class':"entry-title"}):
         title.append(a.text)
@@ -63,7 +62,15 @@ def scrap(older_post):
     mydiv=soup.find_all('div',attrs={'class':"body entry-content"})
      
     for d in mydiv:
+
+        f_img=title[count].replace('/n','').strip() 
         
+        # If img file exist then exit
+        
+        if os.path.isfile(retval+'/'+str(f_img)+'.png'):
+            #print("Exist")
+            exit()
+
         slide =d.find('div',attrs={'class':"sqs-block gallery-block sqs-block-gallery"})
         
         #contains slider images
@@ -75,17 +82,23 @@ def scrap(older_post):
             images=[]
             
             imgs= slide.find_all('img')
+            
             for img in imgs:
-                print(img.get('data-image'))
-                images.append(img.get('data-image'))
+                if img.get("data-image") !=None :
+                    images.append(img.get('data-image'))
             
             u=0
             
             #save images in Images(folder) to create gif out out of them
 
             for i in images:
-                urllib.urlretrieve(i, str(u)+".png")
-                time.sleep(1)
+                #urllib.urlretrieve(i, str(u)+".png")      ##you can use this to download but will create problem if there is any jpg image file
+                #time.sleep(1)
+
+                imgdata = urlopen(i).read()
+                img = Image.open(cStringIO.StringIO(imgdata))
+                img.save(str(u)+".png")
+                
                 u=u+1
 
             #make the images of same size
@@ -93,13 +106,12 @@ def scrap(older_post):
             width = int(1000)
             height = int(1000)
             r=os.getcwd()
-            print(r)
-            print(head)
-
-            head=retval
-            #print(head)
+            #print("r",r)
             
-            f_img=title[count].replace('/n','').strip()
+            head=retval
+
+            #print("head",head)
+            
 
             for fn in sorted(os.listdir(r)):
                 #print(fn)
@@ -116,13 +128,11 @@ def scrap(older_post):
                 #print("resized file saved as %s" % new_image_file)
 
                 #webbrowser.open(new_image_file)        #to see ur resize image file
-            
-
+       
             #take pics from Images(folder) and make gif
 
             with imageio.get_writer(head+'/'+f_img+".gif", mode='I',duration = 0.8) as writer:
                 for fn in sorted(os.listdir(r)):
-
                     image = imageio.imread(r+'/'+fn)
                     writer.append_data(image)
 
@@ -140,12 +150,11 @@ def scrap(older_post):
             
             #set directory         
             os.chdir(retval)
-          
-            print(retval)
+            #print(retval)
                      
             imgs= d.find('img')
+
             '''response = requests.get(imgs.get('src'))
-            
             content_type = response.headers['content-type']
             extension = mimetypes.guess_extension(content_type)
             print(extension)'''
@@ -153,6 +162,12 @@ def scrap(older_post):
 
             #download images                   
             '''urllib.urlretrieve(imgs.get('src'), str(title[count]+str(extension)))'''
+            f_img=title[count].replace('/n','').strip()
+
+            imgdata = urlopen(imgs.get('src')).read()
+            img = Image.open(cStringIO.StringIO(imgdata))
+            img.save(str(f_img+".png"))
+           
             #time.sleep(2)
             count=count+1
     
@@ -166,21 +181,20 @@ def scrap(older_post):
         scrap(older_post)
 
 def main():
-    
+  
     fname=str(raw_input("Enter filename : "))
     create_dir(fname)
+    
     global retval
+
     #gives the  current location of the folder
     retval = os.getcwd() 
     #print(retval)
+    
     scrap("/")
     print("downloading is completed")
-    #print os.getcwd()
- 
-    #shutil.rmtree(r) # remove Images(folder)
+    
+    # remove Images(folder) 
+    shutil.rmtree(retval+'/Images') 
 
 main()
-
-
-
-
